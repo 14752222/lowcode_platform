@@ -55,7 +55,8 @@ jobs:
     - name: Login to ACR with the AccessKey pair
       uses: aliyun/acr-login@v1
       with:
-        region-id: "${{ env.REGION_ID }}"
+        login-server: https://registry.cn-hangzhou.aliyuncs.com
+        region-id: "${{ secrets.REGION_ID }}"
         access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
         access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
 
