@@ -59,64 +59,23 @@ jobs:
         access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
         access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
 
-    # 1.2 Build and push image to ACR
-    - name: Build and push image to ACR
+   #2. 安装nvm
+    - name: nvm action setup
+      uses: actions/setup-node@v2
+      with:
+        node-version: "${{secrets.NODE_VERSION}}"
+   #2. git
+    - name: Set up Git
       run: |
-        docker build --tag "$REGISTRY/$NAMESPACE/$IMAGE:$TAG" .
-        docker push "$REGISTRY/$NAMESPACE/$IMAGE:$TAG"
-
-    # 1.3 Scan image in ACR
-    - name: Scan image in ACR
-      uses: aliyun/acr-scan@v1
-      with:
-        region-id: "${{ env.REGION_ID }}"
-        access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
-        access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
-        repository: "${{ env.NAMESPACE }}/${{ env.IMAGE }}"
-        tag: "${{ env.TAG }}"
-
-    # 2.1 (Optional) Login to ACR EE
-    - uses: actions/checkout@v3
-    - name: Login to ACR EE with the AccessKey pair
-      uses: aliyun/acr-login@v1
-      with:
-        login-server: "https://${{ env.ACR_EE_REGISTRY }}"
-        region-id: "${{ env.REGION_ID }}"
-        access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
-        access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
-        instance-id: "${{ env.ACR_EE_INSTANCE_ID }}"
-
-    # 2.2 (Optional) Build and push image ACR EE
-    - name: Build and push image to ACR EE
+        git config user.email "1364952827@qq.com"
+        git config user.name "ZZL"
+        git status
+   #3. 构建代码 生成dist文件
+    - name: Build
       run: |
-        docker build -t "$ACR_EE_REGISTRY/$ACR_EE_NAMESPACE/$ACR_EE_IMAGE:$TAG" .
-        docker push "$ACR_EE_REGISTRY/$ACR_EE_NAMESPACE/$ACR_EE_IMAGE:$TAG"
-    # 2.3 (Optional) Scan image in ACR EE
-    - name: Scan image in ACR EE
-      uses: aliyun/acr-scan@v1
-      with:
-        region-id: "${{ env.REGION_ID }}"
-        access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
-        access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
-        instance-id: "${{ env.ACR_EE_INSTANCE_ID }}"
-        repository: "${{ env.ACR_EE_NAMESPACE}}/${{ env.ACR_EE_IMAGE }}"
-        tag: "${{ env.ACR_EE_TAG }}"
-
-    # 3.1 Set ACK context
-    - name: Set K8s context
-      uses: aliyun/ack-set-context@v1
-      with:
-        access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
-        access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
-        cluster-id: "${{ env.ACK_CLUSTER_ID }}"
-
-    # 3.2 Deploy the image to the ACK cluster
-    - name: Set up Kustomize
-      run: |-
-        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash /dev/stdin 3.8.6
+        npm install
+        npm run build
+   #4. 转发到apache 的html目录下
     - name: Deploy
-      run: |-
-        ./kustomize edit set image REGISTRY/NAMESPACE/IMAGE:TAG=$REGISTRY/$NAMESPACE/$IMAGE:$TAG
-        ./kustomize build . | kubectl apply -f -
-        kubectl rollout status deployment/$ACK_DEPLOYMENT_NAME
-        kubectl get services -o wide
+      run: |
+        sudo cp -r dist/* "${{secrets.APACHE_HTML_PATH}}}"
