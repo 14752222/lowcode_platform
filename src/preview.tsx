@@ -1,10 +1,17 @@
+// @ts-ignore
 import ReactDOM from 'react-dom';
+// @ts-ignore
 import React, { useState } from 'react';
+// @ts-ignore
 import { Loading } from '@alifd/next';
+// @ts-ignore
 import mergeWith from 'lodash/mergeWith';
+// @ts-ignore
 import isArray from 'lodash/isArray';
 import { buildComponents, assetBundle, AssetLevel, AssetLoader, AssetBundle, AssetItem} from '@alilc/lowcode-utils';
+// @ts-ignore
 import ReactRenderer from '@alilc/lowcode-react-renderer';
+// @ts-ignore
 import {injectComponents} from '@alilc/lowcode-plugin-inject';
 import appHelper from './appHelper';
 import {
@@ -89,6 +96,7 @@ const SamplePreview = () => {
     }
   }
 
+  // @ts-ignore
   return (
     <div className="lowcode-plugin-sample-preview">
       <ReactRenderer
