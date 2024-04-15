@@ -58,7 +58,7 @@ jobs:
       - name: Install npm dependencies
         run: npm install --force
       - name: Run build task
-        run: npm build
+        run: npm run build
       # 1.1 Login to ACR
       - name: Deploy to aliyun server        # 为 step 指定一个名称，将会在 github action 的控制台中显示
         uses: easingthemes/ssh-deploy@v2.1.5      #可以访问的仓库，实现的上传服务器步骤被封装在此action
