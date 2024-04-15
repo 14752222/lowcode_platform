@@ -54,18 +54,18 @@ jobs:
       # 1.1 Login to ACR
       - uses: actions/checkout@v2          #选择一个 现有的action，执行你的操作
         with:
-            persist-credentials: false
-            ref: main
-            submodules: true
-              - name: Deploy to aliyun server        # 为 step 指定一个名称，将会在 github action 的控制台中显示
-                uses: easingthemes/ssh-deploy@v2.1.5      #可以访问的仓库，实现的上传服务器步骤被封装在此action
-                env:
-                  SSH_PRIVATE_KEY: ${{ secrets.ALIYUN_SECRET }}  #这个是阿里云的私钥
-                  ARGS: "-avzr --delete"
-                  SOURCE: "./"
-                  REMOTE_HOST: ${{ secrets.REMOTE_HOST }}    #阿里云的 ip
-                  REMOTE_USER: ${{ secrets.REMOTE_USER }}    #阿里云用户
-                  TARGET: ${{secrets.APACHE_HTML_PATH}}       #被部署的服务器路径
+          persist-credentials: false
+          ref: main
+          submodules: true
+      - name: Deploy to aliyun server        # 为 step 指定一个名称，将会在 github action 的控制台中显示
+        uses: easingthemes/ssh-deploy@v2.1.5      #可以访问的仓库，实现的上传服务器步骤被封装在此action
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ALIYUN_SECRET }}  #这个是阿里云的私钥
+          ARGS: "-avzr --delete"
+          SOURCE: "./"
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}    #阿里云的 ip
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}    #阿里云用户
+          TARGET: ${{secrets.APACHE_HTML_PATH}}       #被部署的服务器路径
       #    - name: Login to ACR with the AccessKey pair
       #      uses: aliyun/acr-login@v1
       #      with:
