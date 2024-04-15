@@ -48,45 +48,49 @@ jobs:
     environment: production
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # 1.1 Login to ACR
-    - uses: actions/checkout@v1
-    - uses: jerray/setup-aliyun-cli-action@v1.0.0
-      with:
-        aliyun-cli-version: '3.0.165'
-        mode: AK
-        access-key-id: ${{ secrets.ACCESS_KEY_ID }}
-        access-key-secret: ${{ secrets.ACCESS_KEY_SECRET }}
-        region: ${{ env.REGION_ID }}
-    - run: pwd
+      # 1.1 Login to ACR
+      - uses: actions/checkout@v2          #选择一个 现有的action，执行你的操作
+        with:
+            persist-credentials: false
+            ref: main
+            submodules: true
+              - name: Deploy to aliyun server        # 为 step 指定一个名称，将会在 github action 的控制台中显示
+                uses: easingthemes/ssh-deploy@v2.1.5      #可以访问的仓库，实现的上传服务器步骤被封装在此action
+                env:
+                  SSH_PRIVATE_KEY: ${{ secrets.ALIYUN_SECRET }}  #这个是阿里云的私钥
+                  ARGS: "-avzr --delete"
+                  SOURCE: "./"
+                  REMOTE_HOST: ${{ secrets.REMOTE_HOST }}    #阿里云的 ip
+                  REMOTE_USER: ${{ secrets.REMOTE_USER }}    #阿里云用户
+                  TARGET: ${{secrets.APACHE_HTML_PATH}}       #被部署的服务器路径
+      #    - name: Login to ACR with the AccessKey pair
+      #      uses: aliyun/acr-login@v1
+      #      with:
+      #        login-server: "${{ env.REGISTRY }}"
+      #        region-id: "${{ env.REGION_ID }}"
+      #        access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
+      #        access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
 
-#    - name: Login to ACR with the AccessKey pair
-#      uses: aliyun/acr-login@v1
-#      with:
-#        login-server: "${{ env.REGISTRY }}"
-#        region-id: "${{ env.REGION_ID }}"
-#        access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
-#        access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
-
-   #2. 安装nvm
-    - name: nvm action setup
-      uses: actions/setup-node@v2
-      with:
-        node-version: "${{secrets.NODE_VERSION}}"
-   #2. git
-    - name: Set up Git
-      run: |
-        git config user.email "1364952827@qq.com"
-        git config user.name "ZZL"
-        git status
-   #3. 构建代码 生成dist文件
-    - name: Build
-      run: |
-        npm install
-        npm run build
-   #4. 转发到apache 的html目录下
-    - name: Deploy
-      run: |
-        sudo cp -r dist/* "${{secrets.APACHE_HTML_PATH}}}"
+      #2. 安装nvm
+      - name: nvm action setup
+        uses: actions/setup-node@v2
+        with:
+          node-version: "${{secrets.NODE_VERSION}}"
+      #2. git
+      - name: Set up Git
+        run: |
+          git config user.email "1364952827@qq.com"
+          git config user.name "ZZL"
+          git status
+      #3. 构建代码 生成dist文件
+      - name: Build
+        run: |
+          npm install
+          npm run build
+      #4. 转发到apache 的html目录下
+      - name: Deploy
+        run: |
+          sudo cp -r dist/* "${{secrets.APACHE_HTML_PATH}}}"
