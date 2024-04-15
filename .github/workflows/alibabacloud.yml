@@ -25,15 +25,15 @@ on:
 
 # Environment variables available to all jobs and steps in this workflow.
 env:
-  REGION_ID: cn-hangzhou
-  REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  REGION_ID: cn-chengdu
+  REGISTRY: registry.cn-chengdu.aliyuncs.com
   NAMESPACE: namespace
   IMAGE: repo
   TAG: ${{ github.sha }}
   ACK_CLUSTER_ID: clusterID
   ACK_DEPLOYMENT_NAME: nginx-deployment
 
-  ACR_EE_REGISTRY: myregistry.cn-hangzhou.cr.aliyuncs.com
+  ACR_EE_REGISTRY: myregistry.cn-chengdu.cr.aliyuncs.com
   ACR_EE_INSTANCE_ID: instanceID
   ACR_EE_NAMESPACE: namespace
   ACR_EE_IMAGE: repo
@@ -55,8 +55,8 @@ jobs:
     - name: Login to ACR with the AccessKey pair
       uses: aliyun/acr-login@v1
       with:
-        login-server: https://registry.cn-chengdu.aliyuncs.com
-        region-id: "${{ secrets.REGION_ID }}"
+        login-server: "${{ env.REGISTRY }}"
+        region-id: "${{ env.REGION_ID }}"
         access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
         access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
 
